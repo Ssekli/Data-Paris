@@ -70,3 +70,5 @@ def creation_hist_q2() :
     #fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
     plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize = 20)
     plt.show()
+    
+    return fig
