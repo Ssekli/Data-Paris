@@ -16,7 +16,7 @@ import seaborn as sns
 from io import BytesIO
 import base64
 
-from .utils import get_graph
+from .utils import get_graph, get_GPS
 from .ben import nettoyage_df, creation_df_prix, creation_hist_q2
 
 def home(request):
@@ -39,6 +39,15 @@ def home(request):
 
             graph = Question_3()
             return render(request, 'main/home.html', {"graph":graph})
+
+        elif request.POST.get("map")[0:3] == "map":
+            print("++++++++ MAP clicked")
+
+            arr = "750" + request.POST.get("map")[3:5]
+            createMapHtml(arr)
+            #graph = Question_3()
+            return render(request, 'main/map1.html')
+
         else:
             print("++++++++ invalid button")
 
@@ -60,10 +69,20 @@ def Question_1():
 
     return graph
 
+def createMapHtml(arr):
+
+    df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
+
+    print(f"++++++++++++++ arr={arr}")
+    get_GPS(arr, df)
+
+    return
 
 def Question_3():
 
     df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
+    
+    #get_GPS(33689, df)
 
     # drop unnecessary columns from DataFrame
     # keep only columns not in list_to_keep

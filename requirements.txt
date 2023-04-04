@@ -1,11 +1,17 @@
-django
-pandas      <-  pip install pandas
-csv         <-  import csv
-datetime    <-  from datetime import datetime
-matplotlib  <-  pip install matplotlib
-seaborn     <-  pip install seaborn
-BytesIO     <-  from io import BytesIO
-base64      <-  import base64
-HttpResponse    <-- from django.http import HttpResponse
+need to install
+    django
+    pandas      <-  pip install pandas
+    matplotlib  <-  pip install matplotlib
+    seaborn     <-  pip install seaborn
+    tools       <-  pip install tools
 
-tools       <-  pip install tools
+    pygeocoder
+    geocoder
+    googlemaps
+
+just import
+    csv         <-  import csv
+    datetime    <-  from datetime import datetime
+    BytesIO     <-  from io import BytesIO
+    base64      <-  import base64
+    HttpResponse    <-- from django.http import HttpResponse
