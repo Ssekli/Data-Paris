@@ -17,7 +17,7 @@ from io import BytesIO
 import base64
 
 from .utils import get_graph
-from .ben import nettoyage_df, creation_df_prix, creation_hist_q2
+from .Q1 import nettoyage_df, creation_df_prix, creation_hist_q2
 
 def home(request):
     
@@ -44,7 +44,8 @@ def home(request):
 
     return render(request, "home.html")
 
-def Question_1():
+def Question_1(request):
+
 
     print(f"++++++++++++++ Q1")
     df_propre = nettoyage_df()
@@ -56,11 +57,11 @@ def Question_1():
     graph = creation_hist_q2(df_arrondissement)
 
     print(f"++++++++++++++ Q1 after creation_hist_q2()")
-    #graph = get_graph()
+    graph = get_graph()
 
-    return graph
+    return render(request, 'Question1.html')
 
-def question2(request):
+def Question_2(request):
     # Lecture de fichier csv
     df = pd.read_csv(
         r"C:\Users\user\PycharmProjects\Greta-Formation-Python-2023\jeu-de-donnes-que-faire-a-paris\que-faire-a-paris-.csv",
@@ -123,7 +124,7 @@ def question2(request):
     barplot_file = "static/images/q2_barplot.png"
     sns_plot.get_figure().savefig(barplot_file)
 
-    return render(request, 'question2.html', {'pie_graph_file': pie_graph_file, 'barplot_file': barplot_file})
+    return render(request, 'Question2.html', {'pie_graph_file': pie_graph_file, 'barplot_file': barplot_file})
 
 
 def Question_3():
