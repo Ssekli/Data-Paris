@@ -43,7 +43,7 @@ def home(request):
         elif request.POST.get("map")[0:3] == "map":
             print("++++++++ MAP clicked")
 
-            arr = "750" + request.POST.get("map")[3:5]
+            arr = request.POST.get("map")[3:8]
             createMapHtml(arr)
             #graph = Question_3()
             return render(request, 'main/map1.html')
@@ -51,7 +51,30 @@ def home(request):
         else:
             print("++++++++ invalid button")
 
-    return render(request, "main/home.html")
+    list_arr = [
+        "75001",
+        "75002",
+        "75003",
+        "75004",
+        "75005",
+        "75006",
+        "75007",
+        "75008",
+        "75009",
+        "75010",
+        "75011",
+        "75012",
+        "75013",
+        "75014",
+        "75015",
+        "75016",
+        "75017",
+        "75018",
+        "75019",
+        "75020"
+    ]
+
+    return render(request, "main/home.html", {"list_arr":list_arr})
 
 def Question_1():
 

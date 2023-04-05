@@ -16,30 +16,21 @@
 
         </form>
         </p>
+
+        <p>
         <form method="post" target="_blank" action="{% url 'temp' %}">
             {% csrf_token %}
-            <button type="submit", name="map", value="map01">MAP 75001</button>
-            <button type="submit", name="map", value="map01">MAP 75002</button>
-            <button type="submit", name="map", value="map03">MAP 75003</button>
-            <button type="submit", name="map", value="map04">MAP 75004</button>
-            <button type="submit", name="map", value="map05">MAP 75005</button><br>
-            <button type="submit", name="map", value="map06">MAP 75006</button>
-            <button type="submit", name="map", value="map07">MAP 75007</button>
-            <button type="submit", name="map", value="map08">MAP 75008</button>
-            <button type="submit", name="map", value="map09">MAP 75009</button>
-            <button type="submit", name="map", value="map10">MAP 75010</button><br>
-            <button type="submit", name="map", value="map11">MAP 75011</button>
-            <button type="submit", name="map", value="map12">MAP 75012</button>
-            <button type="submit", name="map", value="map13">MAP 75013</button>
-            <button type="submit", name="map", value="map14">MAP 75014</button>
-            <button type="submit", name="map", value="map15">MAP 75015</button><br>
-            <button type="submit", name="map", value="map16">MAP 75016</button>
-            <button type="submit", name="map", value="map17">MAP 75017</button>
-            <button type="submit", name="map", value="map18">MAP 75018</button>
-            <button type="submit", name="map", value="map19">MAP 75019</button>
-            <button type="submit", name="map", value="map20">MAP 75020</button>
+                <h6>
+                {% for item in list_arr %}
+                    <button type="submit", name="map", value="map{{item}}">{{item}}</button><br> 
+                {% endfor %}
+                <!-- <input type="checkbox", value="clicked", name="{{item}}">  &nbsp {{item}}<br> -->
+                </h6>
+                <!-- <button type="submit", name="map", value="map">Q3</button> -->
         </form>
         <h5>marqueur rouge : gratuit</h5>
+        </p>
+
         {% if graph %}
             <img src="data:image/png;base64, {{graph|safe}}">
         {% endif %}
