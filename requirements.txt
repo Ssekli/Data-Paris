@@ -5,9 +5,7 @@ need to install
     seaborn     <-  pip install seaborn
     tools       <-  pip install tools
 
-    pygeocoder
-    geocoder
-    googlemaps
+    folium      <-  pip install folium
 
 just import
     csv         <-  import csv

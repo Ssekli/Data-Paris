@@ -5,6 +5,7 @@
     <h3>
         Great78
     <!--    <form method="post" action="/list/">　 -->
+        <p>
         <form method="post" action="{% url 'temp' %}">
         
             {% csrf_token %}
@@ -14,6 +15,7 @@
             <button type="submit", name="Q3", value="Q3">Q3</button>
 
         </form>
+        </p>
         <form method="post" target="_blank" action="{% url 'temp' %}">
             {% csrf_token %}
             <button type="submit", name="map", value="map01">MAP 75001</button>
@@ -37,6 +39,7 @@
             <button type="submit", name="map", value="map19">MAP 75019</button>
             <button type="submit", name="map", value="map20">MAP 75020</button>
         </form>
+        <h5>marqueur rouge : gratuit</h5>
         {% if graph %}
             <img src="data:image/png;base64, {{graph|safe}}">
         {% endif %}

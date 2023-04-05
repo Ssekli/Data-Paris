@@ -72,8 +72,11 @@ def Question_1():
 def createMapHtml(arr):
 
     df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
+    df_propre = df_cleaning(df)
+    df = df_propre.copy()
 
-    print(f"++++++++++++++ arr={arr}")
+    #print(df.dtypes)
+    #print(f"++++++++++++++ arr={arr}")
     get_GPS(arr, df)
 
     return
