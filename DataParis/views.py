@@ -83,7 +83,7 @@ def Question_1(request) :
     #creation du df pour l'affichage
     df_show = df_valid.value_counts()
     df_show = df_show.to_frame()
-    df_show = df_show.sort_values(by = "address_zipcode", ascending = True)
+    df_show = df_show.sort_values(by = ["address_zipcode", "price_type"], ascending = True)
     df_show = df_show.transpose()    
     df_html = df_show.to_html()
 
