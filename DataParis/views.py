@@ -46,20 +46,60 @@ def home(request):
 
 def Question_1(request):
 
+    df = pd.read_csv("E:/Projet_Data1/Data-Paris-Main/que-faire-a-paris-.csv", sep= ';', header = 0)
+    #df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
+    df_propre = df.copy()
 
-    print(f"++++++++++++++ Q1")
-    df_propre = nettoyage_df()
-    
-    print(f"++++++++++++++ Q1 after nettoyage_df()")
-    df_arrondissement = creation_df_prix(df_propre)
-    
-    print(f"++++++++++++++ Q1 after creation_df_prix()")
-    graph = creation_hist_q2(df_arrondissement)
+    df_propre.isnull().values.any()
 
-    print(f"++++++++++++++ Q1 after creation_hist_q2()")
+    #gerer les valeurs vides
+    df_propre.dropna(how= 'all', inplace= True)
+
+    #supprimer ce qui n'est pas dans Paris
+    indexVille = df_propre[ df_propre["address_city"] != "Paris" ].index
+    df_propre.drop(indexVille, inplace= True)
+
+    #df_propre.drop(columns = ["url",  ],  inplace = True)
+    df_propre.drop(df_propre.columns.difference(['id', 'title', 'date_start', 'date_end', 'tags', 'address_name', 'address_street', 'address_zipcode', 'lat_lon', 'price_type']), axis=1, inplace=True)
+    
+    arrondissement = [75001, 75002, 75003, 75004, 75005, 75006, 75007, 75008, 75009, 75010, 75011, 75012, 75013, 75014, 75015, 75016, 75017, 75018, 75019, 75020]
+
+    df_price_rip = df_propre["price_type"]
+    df_arr = df_propre["address_zipcode"]
+
+    df_price = df_price_rip.replace("gratuit sous condition", "gratuit")
+    print(df_price.value_counts())
+
+    df_arrondissement = pd.concat([df_price, df_arr], axis = 1)
+
+    threshold = 10
+    zip_counts = df_arrondissement ["address_zipcode"].value_counts()
+    valid_zips = zip_counts[zip_counts >= threshold].index
+    df_valid = df_arrondissement[df_arrondissement["address_zipcode"].isin(valid_zips)]
+    #print(df_valid.value_counts())
+
+    plt.switch_backend('AGG')       # added Katsuji
+
+    plt.rcParams['axes.labelsize'] = 20
+    plt.rcParams['xtick.labelsize'] = 20
+    plt.rcParams['ytick.labelsize'] = 20
+    plt.rcParams['legend.fontsize'] = 20
+    #plt.figure(figsize=(30,30))
+    plt.figure(figsize=(10, 8))     # modified Katsuji
+
+    fig = sns.countplot(x="address_zipcode", hue="price_type", data = df_valid, order = ["75001", "75002", "75003", "75004", "75005", "75006", "75007", "75008", "75009", "75010", "75011", "75012", "75013", "75014", "75015", "75016", "75017", "75018", "75019", "75020"])
+    #fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
+    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize = 20)
+    plt.show()
+    plt.xticks(rotation = 45)
+
     graph = get_graph()
+    #print(graph)
 
-    return render(request, 'Question1.html')
+    return render (request, "main/home.html", {"graph": graph})
+    #je dois render dans le home parce que spaghetti
+
+
 
 def Question_2(request):
     # Lecture de fichier csv
@@ -125,6 +165,8 @@ def Question_2(request):
     sns_plot.get_figure().savefig(barplot_file)
 
     return render(request, 'Question2.html', {'pie_graph_file': pie_graph_file, 'barplot_file': barplot_file})
+
+
 
 
 def Question_3():
