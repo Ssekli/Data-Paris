@@ -39,9 +39,8 @@
 
       <div class="bloc_graph">
         <label class="label_graph"> Graphique :</label> 
-    
         <hr>
-        <img src="{{ graph }}" alt="Graph">
+        
       </div>
 
       <div class="bloc_graph">
@@ -50,6 +49,15 @@
         
       </div>
 
+    <div>
+      <table id="efficiency-hub-table" class="table table-bordered dt-responsive nowrap w-100" style="border-collapse: collapse;">
+       <thead>
+        {{df_show | safe}}
+       </thead>
+      </table>
+      
+
+      
     </div>
   
   

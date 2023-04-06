@@ -6,7 +6,7 @@ import pandas as pd
 import csv
 import numpy
 import numpy as np
-import matplotlib
+import matplotlib as mpl
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -17,7 +17,8 @@ from io import BytesIO
 import base64
 
 from .utils import get_graph
-from .Q1 import nettoyage_df, creation_df_prix, creation_hist_q2
+from .ben import nettoyage_df, creation_df_prix, creation_hist_q2
+
 
 def home(request):
     
@@ -44,10 +45,9 @@ def home(request):
 
     return render(request, "home.html")
 
-def Question_1(request):
+def Question_1(request) :
 
-    df = pd.read_csv("E:/Projet_Data1/Data-Paris-Main/que-faire-a-paris-.csv", sep= ';', header = 0)
-    #df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
+    df = pd.read_csv("E:/Projet_Data/Data/que-faire-a-paris-.csv", sep= ';', header = 0)
     df_propre = df.copy()
 
     df_propre.isnull().values.any()
@@ -61,7 +61,12 @@ def Question_1(request):
 
     #df_propre.drop(columns = ["url",  ],  inplace = True)
     df_propre.drop(df_propre.columns.difference(['id', 'title', 'date_start', 'date_end', 'tags', 'address_name', 'address_street', 'address_zipcode', 'lat_lon', 'price_type']), axis=1, inplace=True)
-    
+
+
+    #print(df_propre.isnull().values.any())
+
+    #print(df_propre)
+
     arrondissement = [75001, 75002, 75003, 75004, 75005, 75006, 75007, 75008, 75009, 75010, 75011, 75012, 75013, 75014, 75015, 75016, 75017, 75018, 75019, 75020]
 
     df_price_rip = df_propre["price_type"]
@@ -71,41 +76,50 @@ def Question_1(request):
     print(df_price.value_counts())
 
     df_arrondissement = pd.concat([df_price, df_arr], axis = 1)
+    
 
+    #df_arrondissement = df_arrondissement.reset_index()
+
+    #print(df_arrondissement.value_counts())
+
+    #df_arrondissement.hist(column= "address_zipcode", by = "price_type")
+    # plt.show()
+
+    #sns.countplot(x = "address_zipcode", hue ="price_type", data = df_arrondissement)
     threshold = 10
     zip_counts = df_arrondissement ["address_zipcode"].value_counts()
     valid_zips = zip_counts[zip_counts >= threshold].index
     df_valid = df_arrondissement[df_arrondissement["address_zipcode"].isin(valid_zips)]
-    #print(df_valid.value_counts())
+    print(df_valid.value_counts())
+    df_show = df_valid.value_counts()
+    df_show = df_show.to_frame()
+    df_show = df_show.sort_values(by = "address_zipcode", ascending = True)
+    df_show = df_show.transpose()    
+    df_html = df_show.to_html()
 
     plt.switch_backend('AGG')       # added Katsuji
 
-    plt.rcParams['axes.labelsize'] = 20
-    plt.rcParams['xtick.labelsize'] = 20
-    plt.rcParams['ytick.labelsize'] = 20
-    plt.rcParams['legend.fontsize'] = 20
+    mpl.rcParams['axes.labelsize'] = 20
+    mpl.rcParams['xtick.labelsize'] = 12
+    mpl.rcParams['ytick.labelsize'] = 20
+    mpl.rcParams['legend.fontsize'] = 20
     #plt.figure(figsize=(30,30))
     plt.figure(figsize=(10, 8))     # modified Katsuji
 
     fig = sns.countplot(x="address_zipcode", hue="price_type", data = df_valid, order = ["75001", "75002", "75003", "75004", "75005", "75006", "75007", "75008", "75009", "75010", "75011", "75012", "75013", "75014", "75015", "75016", "75017", "75018", "75019", "75020"])
     #fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
     plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize = 20)
-    plt.show()
     plt.xticks(rotation = 45)
-
+    
     graph = get_graph()
-    #print(graph)
+    #plt.show()
 
-    return render (request, "main/home.html", {"graph": graph})
-    #je dois render dans le home parce que spaghetti
-
+    return render(request, "main/home.html", {"graph" : graph, "df_show": df_html })
 
 
-def Question_2(request):
+def question2(request):
     # Lecture de fichier csv
-    df = pd.read_csv(
-        r"C:\Users\user\PycharmProjects\Greta-Formation-Python-2023\jeu-de-donnes-que-faire-a-paris\que-faire-a-paris-.csv",
-        sep=';', header=0)
+    df = pd.read_csv("static\data\que-faire-a-paris-.csv", sep=';', header=0)
 
     # Copier df to df_propre pour faire les manipulations
     df_propre = df.copy()
@@ -153,7 +167,7 @@ def Question_2(request):
     # ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'], autopct='%1.1f%%')
     # Add a title
     ax.set_title('Pie Chart for Evenements')
-    pie_graph_file = "static/images/q2_pie.png"
+    pie_graph_file = "static/graph_images/q2_pie.png"
     plt.savefig(pie_graph_file)
     plt.close(fig1)
 
@@ -161,12 +175,10 @@ def Question_2(request):
 
     sns_plot = sns.barplot(x='occurrences', y='evenement', data=df_filtered)
     sns_plot.set_title('Barplot for Evenements')
-    barplot_file = "static/images/q2_barplot.png"
+    barplot_file = "static/graph_images/q2_barplot.png"
     sns_plot.get_figure().savefig(barplot_file)
 
-    return render(request, 'Question2.html', {'pie_graph_file': pie_graph_file, 'barplot_file': barplot_file})
-
-
+    return render(request, 'question2.html', {'pie_graph_file': pie_graph_file, 'barplot_file': barplot_file})
 
 
 def Question_3():

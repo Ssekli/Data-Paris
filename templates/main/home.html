@@ -14,6 +14,17 @@
             <button type="submit", name="Q3", value="Q3">Q3</button>
 
         </form>
+        
+    <div>
+        <table id="efficiency-hub-table" class="table table-bordered dt-responsive nowrap w-100" style="border-collapse: collapse;">
+         <thead>
+          {{df_show | safe}}
+         </thead>
+        </table>
+        
+  
+        
+      </div>
         {% if graph %}
             <img src="data:image/png;base64, {{graph|safe}}">
         {% endif %}
