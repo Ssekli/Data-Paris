@@ -22,6 +22,17 @@ def get_graph():
     buffer.close()
     return graph
 
+def get_table():
+
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    table = base64.b64encode(image_png)
+    table = table.decode('utf-8')
+    buffer.close()
+    return table
+
 ###----------------------
 #
 #    get_GPS()

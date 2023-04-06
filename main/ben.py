@@ -76,6 +76,7 @@ def creation_hist_q2(df_arrondissement) :
     plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize = 20)
     
     graph = get_graph()
+    #print(f"----------- graph Q1 {graph}")
     #plt.show()
 
     return graph

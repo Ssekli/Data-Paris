@@ -16,10 +16,14 @@ import seaborn as sns
 from io import BytesIO
 import base64
 
-from .utils import get_graph, get_GPS
+from .utils import get_graph, get_GPS, get_table
 from .ben import nettoyage_df, creation_df_prix, creation_hist_q2
 
+global df_global
+
 def home(request):
+
+    global df_global
     
     print("HOME")
     print(f"request.POST={request.POST} request.method={request.method}")
@@ -29,7 +33,8 @@ def home(request):
             print("++++++++ Q1 clicked")
 
             graph = Question_1()
-            return render(request, 'main/home.html', {"graph":graph})
+            #return render(request, 'main/home.html', {"graph":graph})
+            return render(request, 'main/map1.html')
 
         elif request.POST.get("Q2") == "Q2":
             print("++++++++ Q2 clicked")
@@ -37,8 +42,11 @@ def home(request):
         elif request.POST.get("Q3") == "Q3":
             print("++++++++ Q3 clicked")
 
-            graph = Question_3()
+            graph = Question_3(request)
+            print(f"+++++++++++ point 1 ++++++")
+            print(f"graph={graph}")
             return render(request, 'main/home.html', {"graph":graph})
+            #return render(request, "main/home.html")
 
         elif request.POST.get("map")[0:3] == "map":
             print("++++++++ MAP clicked")
@@ -50,6 +58,8 @@ def home(request):
 
         else:
             print("++++++++ invalid button")
+
+    df_global = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
 
     list_arr = [
         "75001",
@@ -76,7 +86,7 @@ def home(request):
 
     return render(request, "main/home.html", {"list_arr":list_arr})
 
-def Question_1():
+def Question_1(request):
 
     print(f"++++++++++++++ Q1")
     df_propre = nettoyage_df()
@@ -90,7 +100,8 @@ def Question_1():
     print(f"++++++++++++++ Q1 after creation_hist_q2()")
     #graph = get_graph()
 
-    return graph
+    #return graph
+    return render(request, 'main/home.html', {"graph":graph})
 
 def createMapHtml(arr):
 
@@ -104,10 +115,16 @@ def createMapHtml(arr):
 
     return
 
-def Question_3():
+def Question_2(request):
+    pass
 
-    df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
-    
+def Question_3(request):
+
+    global df_global
+
+    #df = pd.read_csv("/Users/katsuji/Downloads/que-faire-a-paris-.csv", sep=';', header=0)
+    df = df_global
+
     #get_GPS(33689, df)
 
     # drop unnecessary columns from DataFrame
@@ -175,11 +192,18 @@ def Question_3():
     condition_1 = 'price_type'
     price_type_lt = ['gratuit', 'payant']
     condition_3 = 'saison' 
-    graph = construct_graph_bar(df_propre_v2, condition_1, price_type_lt, condition_3)
+    graph, df_tmp = construct_graph_bar(df_propre_v2, condition_1, price_type_lt, condition_3)
+
+    table = construct_table_img(df_tmp)
+
+    #print(f"======= df_propre_v2 \n{df_propre_v2.dtypes}")
+    print(f"%%%%%%%%% in Q3() df_tmp\n{df_tmp}")
+    #print(f"%%%%%%%%% in Q3() img:df_tmp\n{table}")
 
     print("++++++++ Q3 ENDING  ++++++++++++++")
-    
-    return graph
+    #print(f"graph={graph}")
+    #return graph
+    return render(request, 'main/home.html', {"graph":graph, "table":table})
 
 def df_cleaning(in_df):
 
@@ -297,6 +321,9 @@ def construct_graph_bar(df, condition_1, condition_lt, condition_3):
     new_name = "Nombre d'évènements"
     df_tmp.rename(columns={"id": new_name}, inplace=True)
 
+    print(f"&&&&&&&&&  data for graph(df_tmp) \n{df_tmp.dtypes}")
+    print(df_tmp)
+
     sns.set()
 
     plt.switch_backend('AGG')
@@ -318,7 +345,34 @@ def construct_graph_bar(df, condition_1, condition_lt, condition_3):
     # output graph plotted by seaborn/matplotlib as image data
     graph = get_graph()
 
-    return graph
+    return graph, df_tmp
     #return render(request, 'main/home.html', {"chart":chart})
+
+
+def construct_table_img(df):
+
+    fig, ax = plt.subplots(figsize=(8,3))
+    ax.axis('off')
+    ax.axis('tight')
+    ax.table(cellText=df.values,
+         colLabels=df.columns,
+         colColours =["gold"] * 3,
+         loc='center',
+         bbox=[0,0,1,1])
+    '''
+    buffer = BytesIO()
+    #plt.savefig('table.png')
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    table = base64.b64encode(image_png)
+    table = table.decode('utf-8')
+    buffer.close()
+    '''
+    table = get_table()
+
+    #table = ""
+
+    return table
 
 
