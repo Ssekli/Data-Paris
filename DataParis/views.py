@@ -88,9 +88,10 @@ def question1(request):
     plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=20)
     plt.xticks(rotation=45)
 
-    graph = get_graph()
+    countplot_file = "static/graph_images/q1_countplot.png"
+    fig.get_figure().savefig(countplot_file)
 
-    return render(request, "question1.html", {"graph": graph, "df_show": df_html})
+    return render(request, "question1.html", {"graph": countplot_file, "df_show": df_html})
 
 
 def question2(request):
