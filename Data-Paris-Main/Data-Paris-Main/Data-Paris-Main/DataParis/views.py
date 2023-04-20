@@ -125,14 +125,20 @@ def question2(request):
             dict[i] = 1
 
     df_tags = pd.DataFrame(list(dict.items()), columns=['evenement', 'occurrences'])
+
+    # Retirer les Evenements marqués comme "NaN"
+    # Filter NAN Data Selection column of strings by not (~) operator is used to negate the statement.
+    df_tags = df_tags[~pd.isnull(df_tags['evenement'])]
+
     html_df_tags = df_tags.to_html()
 
     df_filtered = df_tags[df_tags['occurrences'] > 33]
-    
+
+    # close all open figures and set the Matplotlib backend. AGG for png images
+    plt.switch_backend('AGG')
 
     # Create the pie chart
     fig1, ax = plt.subplots(figsize=(7, 5))
-    
 
     ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'])
     # ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'], autopct='%1.1f%%')
@@ -141,18 +147,20 @@ def question2(request):
     pie_graph_file = "static/graph_images/q2_pie.png"
     plt.savefig(pie_graph_file)
     plt.close(fig1)
+    
 
     # fig2, sns = plt.subplots()
-
+    
     mpl.rcParams['axes.labelsize'] = 15
     mpl.rcParams['xtick.labelsize'] = 10
     mpl.rcParams['ytick.labelsize'] = 10
     mpl.rcParams['legend.fontsize'] = 15
     plt.figure(figsize=(7, 5)) 
+    
 
     sns_plot = sns.barplot(x='occurrences', y='evenement', data=df_filtered)
     sns_plot.set_title('Barplot for Evenements')
-    sns_plot.set_yticklabels(sns_plot.get_yticklabels(), rotation=45)
+    sns_plot.set_yticklabels(sns_plot.get_yticklabels(), rotation=45) 
     barplot_file = "static/graph_images/q2_barplot.png"
     sns_plot.get_figure().savefig(barplot_file)
 
