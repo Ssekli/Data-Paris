@@ -1,6 +1,0 @@
-django
-pandas   
-matplotlib
-seaborn
-tools
-bokeh
