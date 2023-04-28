@@ -14,7 +14,6 @@ import pytz
 import seaborn as sns
 
 
-
 from io import BytesIO
 import base64
 
@@ -44,11 +43,6 @@ def nettoyage_df():
 def home(request):
     return render(request, "home.html")
 
-#
-#   this uestion1() was
-#   updated to question1() below by Benjamin 17April2023
-#
-
 def question1(request):
     df_propre = nettoyage_df()
 
@@ -68,23 +62,31 @@ def question1(request):
     df_valid = df_arrondissement[df_arrondissement["address_zipcode"].isin(valid_zips)]
     print(df_valid.value_counts())
 
-    # creation du df pour l'affichage
-    df_show = df_valid.value_counts()
-    df_show = df_show.to_frame()
-    df_show = df_show.sort_values(by=["price_type", "address_zipcode"], ascending=True)
-    # df_show = df_show.transpose()
-    df_html = df_show.to_html()
+    # creation du df free pour l'affichage
+    df_show_free = df_valid.loc[(df_valid["price_type"] == "gratuit") & (df_valid["address_zipcode"])]
+    df_show_free = df_show_free.value_counts()
+    df_show_free = df_show_free.to_frame()
+    df_show_free = df_show_free.sort_values(by=["address_zipcode", "price_type"], ascending=True)
+    # df_show_free = df_show_free.transpose()
+    df_html_free = df_show_free.to_html()
 
+    # creation du df payant pour l'affichage
+    df_show_pay = df_valid.loc[(df_valid["price_type"] == "payant") & (df_valid["address_zipcode"])]
+    df_show_pay = df_show_pay.value_counts()
+    df_show_pay = df_show_pay.to_frame()
+    df_show_pay = df_show_pay.sort_values(by=["address_zipcode", "price_type"], ascending=True)
+    # df_show_pay = df_show_pay.transpose()
+    df_html_pay = df_show_pay.to_html()
 
     # parametres du countplot
     plt.switch_backend('AGG')  # added Katsuji
-
-    mpl.rcParams['axes.labelsize'] = 10
-    mpl.rcParams['xtick.labelsize'] = 10
-    mpl.rcParams['ytick.labelsize'] = 10
-    mpl.rcParams['legend.fontsize'] = 15
+    
+    mpl.rcParams['axes.labelsize'] = 7
+    mpl.rcParams['xtick.labelsize'] = 7
+    mpl.rcParams['ytick.labelsize'] = 7
+    mpl.rcParams['legend.fontsize'] = 7
     # plt.figure(figsize=(30,30))
-    plt.figure(figsize=(7, 5))  # modified Katsuji
+    plt.figure(figsize=(6.5, 5))  # modified Katsuji
 
     # creation du countplot
     fig = sns.countplot(x="address_zipcode", hue="price_type", data=df_valid,
@@ -92,13 +94,14 @@ def question1(request):
                                "75011", "75012", "75013", "75014", "75015", "75016", "75017", "75018", "75019",
                                "75020"])
     # fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
-    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=13)
+    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=11)
     plt.xticks(rotation=45)
+
 
     countplot_file = "static/graph_images/q1_countplot.png"
     fig.get_figure().savefig(countplot_file)
 
-    return render(request, "question1.html", {"graph": countplot_file, "df_show": df_html})
+    return render(request, "question1.html", {"graph": countplot_file, "df_show": df_html_free, "df_show1": df_html_pay})
 
 
 #-------------------------------------
@@ -124,43 +127,53 @@ def question2(request):
         else:
             dict[i] = 1
 
-    df_tags = pd.DataFrame(list(dict.items()), columns=['evenement', 'occurrences'])
+
+    
+    
+    df_tags = pd.DataFrame(list(dict.items()), columns=['Évènements', 'Occurrences'])
+    
 
     # Retirer les Evenements marqués comme "NaN"
     # Filter NAN Data Selection column of strings by not (~) operator is used to negate the statement.
-    df_tags = df_tags[~pd.isnull(df_tags['evenement'])]
+    df_tags = df_tags[~pd.isnull(df_tags['Évènements'])]
 
+    
     html_df_tags = df_tags.to_html()
+    # html_df_tags = df_tags.transpose().to_html()
 
-    df_filtered = df_tags[df_tags['occurrences'] > 33]
+
+    df_filtered = df_tags[df_tags['Occurrences'] > 33]
 
     # close all open figures and set the Matplotlib backend. AGG for png images
     plt.switch_backend('AGG')
 
     # Create the pie chart
-    fig1, ax = plt.subplots(figsize=(7, 5))
+    
+    fig1, ax = plt.subplots()
+    # fig1, ax = plt.subplots(figsize = (7, 5))
 
-    ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'])
-    # ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'], autopct='%1.1f%%')
+    ax.pie(df_filtered['Occurrences'], labels=df_filtered['Évènements'], textprops={'fontsize': 10}, rotatelabels=15, startangle=90)
+    # ax.pie(df_filtered['Occurrences'], labels=df_filtered['Évènement'], autopct='%1.1f%%')
+
     # Add a title
-    ax.set_title('Pie Chart for Evenements')
+    # ax.set_title('Pie Chart for Évènements')
+    
+    
     pie_graph_file = "static/graph_images/q2_pie.png"
     plt.savefig(pie_graph_file)
     plt.close(fig1)
-    
 
     # fig2, sns = plt.subplots()
     
-    mpl.rcParams['axes.labelsize'] = 15
-    mpl.rcParams['xtick.labelsize'] = 10
-    mpl.rcParams['ytick.labelsize'] = 10
-    mpl.rcParams['legend.fontsize'] = 15
-    plt.figure(figsize=(7, 5)) 
-    
+    mpl.rcParams['axes.labelsize'] = 10
+    mpl.rcParams['xtick.labelsize'] = 8.5
+    mpl.rcParams['ytick.labelsize'] = 8.5
+    mpl.rcParams['legend.fontsize'] = 10
+    plt.figure(figsize=(6, 5)) 
 
-    sns_plot = sns.barplot(x='occurrences', y='evenement', data=df_filtered)
-    sns_plot.set_title('Barplot for Evenements')
-    sns_plot.set_yticklabels(sns_plot.get_yticklabels(), rotation=45) 
+    sns_plot = sns.barplot(x='Occurrences', y='Évènements', data=df_filtered)
+    sns_plot.set_title('Barplot for Évènements')
+    sns_plot.set_yticklabels(sns_plot.get_yticklabels(), rotation=60)
     barplot_file = "static/graph_images/q2_barplot.png"
     sns_plot.get_figure().savefig(barplot_file)
 
@@ -171,7 +184,18 @@ def question2(request):
 def question3(request):
     df_propre = nettoyage_df()
 
+    #--------------------------------------
+    # added on 17April2023 by Katsuji
+    #
+    df_propre = df_propre.reset_index()
+
+    print("------------ df_propre ")
+    print(df_propre.isnull().sum())
+
     df_tmp_2 = convert_to_datetime(df_propre)
+
+    print("------------ df_tmp_2 ")
+    print(df_tmp_2.isnull().sum())
 
     # calculate the duration of event and add it to DataFrame.
     #   column added : "duration(days)"
@@ -304,6 +328,9 @@ def construct_graph_bar(df, condition_1, condition_lt, condition_3):
     #print(f"----------- df ")
     #print(df.groupby('saison').count())
 
+    #
+    #   drop rows with price_type = 'gratuit sous condition'
+    #
     i = 0
     for condition_tmp in condition_lt:
         df_tmp = df[df[condition_1] == condition_tmp]
@@ -327,7 +354,7 @@ def construct_graph_bar(df, condition_1, condition_lt, condition_3):
     sns.set()
 
     plt.switch_backend('AGG')
-    plt.figure(figsize=(7, 5), facecolor="w")
+    plt.figure(figsize=(6, 5), facecolor="w")
     sns.barplot(data=df_tmp, x="type", y=new_name, hue="saison", hue_order=["printemps", "ete", "automne", "hiver"])
     title = "Nombre d'évènements par type de paiement"
     plt.title(title)
@@ -394,19 +421,19 @@ def creation_hist_q2(df_arrondissement):
 
     plt.switch_backend('AGG')  # added Katsuji
 
-    mpl.rcParams['axes.labelsize'] = 20
-    mpl.rcParams['xtick.labelsize'] = 20
-    mpl.rcParams['ytick.labelsize'] = 20
-    mpl.rcParams['legend.fontsize'] = 20
+    mpl.rcParams['axes.labelsize'] = 10
+    mpl.rcParams['xtick.labelsize'] = 10
+    mpl.rcParams['ytick.labelsize'] = 10
+    mpl.rcParams['legend.fontsize'] = 10
     # plt.figure(figsize=(30,30))
-    plt.figure(figsize=(10, 8))  # modified Katsuji
+    plt.figure(figsize=(7, 5))  # modified Katsuji
 
     fig = sns.countplot(x="address_zipcode", hue="price_type", data=df_valid,
                         order=["75001", "75002", "75003", "75004", "75005", "75006", "75007", "75008", "75009", "75010",
                                "75011", "75012", "75013", "75014", "75015", "75016", "75017", "75018", "75019",
                                "75020"])
     # fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
-    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=20)
+    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=14)
 
     graph = get_graph()
     # plt.show()
@@ -418,7 +445,7 @@ def creation_hist_q2(df_arrondissement):
 #
 def construct_table_img(df):
 
-    fig, ax = plt.subplots(figsize=(7,5))
+    fig, ax = plt.subplots(figsize=(6,5))
     ax.axis('off')
     ax.axis('tight')
     ax.table(cellText=df.values,
@@ -455,3 +482,7 @@ def get_table():
     table = table.decode('utf-8')
     buffer.close()
     return table
+
+
+def map (request):
+    return render(request, "map.html")
