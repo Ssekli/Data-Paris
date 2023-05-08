@@ -1,0 +1,42 @@
+{% extends 'generic.html' %}
+{% load static %}
+{% block content %}
+
+<h1>QUE FAIRE À <br> P<img src="/static/images/Tour_eiffel.png" alt="Tour Eiffel" style="transform: translateY(1vw);"/>RIS ?</h1>
+
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <div class="container">
+        
+
+        <a href="{% url 'question1' %}" class="bloc">
+            <span>Évènements payants / gratuits par arrondissment </span>
+        </a>
+
+
+
+        <a href="{% url 'question2' %}" class="bloc">
+            <span>Type d'événement</span>
+        </a>
+    
+        
+    </div>
+
+    
+
+    <div class="container">
+
+
+        <a href="{% url 'question3' %}" class="bloc">
+            <span>Par saison</span>
+        </a>
+
+
+
+        <a href="{% url 'map' %}" class="bloc">
+            <span>Map évènements à Paris</span>
+        </a>
+        
+    </div>
+</div>
+
+{% endblock %}

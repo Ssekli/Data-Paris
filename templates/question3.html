@@ -1,0 +1,31 @@
+{% extends 'generic_questions.html' %}
+{% load static %}
+{% block question_content %}
+<div class="bandeau_question">
+    <label class="label_bandeau"> Types d'évènements par saison</label>
+    <br>
+<!--    {% if graph %}-->
+    <!--            <img src="data:image/png;base64, {{graph|safe}}">-->
+<!--    {% endif %}-->
+</div>
+
+
+
+<div class="container2">
+
+    <div class="bloc_graph">
+        <label class="label_graph"> Graphique :</label>
+        <hr>
+        <img src="data:image/png;base64, {{graph}}" class="graph_img">
+    </div>
+
+
+    <div class="bloc_graph">
+        <label class="label_graph"> Table :</label>
+        <hr>
+        <img src="data:image/png;base64, {{table}}" class="graph_img">
+    </div>
+
+</div>
+
+{% endblock %}
