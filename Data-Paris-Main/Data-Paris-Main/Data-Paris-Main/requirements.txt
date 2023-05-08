@@ -1,6 +1,0 @@
-python == 3.10
-django
-pandas   
-matplotlib
-seaborn
-tools
