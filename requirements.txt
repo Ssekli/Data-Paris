@@ -1,6 +1,8 @@
-python == 3.10
 django
 pandas   
 matplotlib
 seaborn
 tools
+bokeh
+gmaps
+gmplot

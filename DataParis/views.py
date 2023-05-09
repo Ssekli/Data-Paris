@@ -18,6 +18,23 @@ from io import BytesIO
 import base64
 
 
+###
+import webbrowser
+
+from bokeh.io import show
+from bokeh.plotting import gmap
+from bokeh.models import GMapOptions
+
+from bokeh.models import ColumnDataSource
+
+import gmaps
+import gmaps.datasets
+
+#import gmap
+import gmplot
+###
+
+
 def nettoyage_df():
     # lecture de la base
     #df = pd.read_csv("static\data\que-faire-a-paris-.csv", sep=';', header=0)
@@ -62,22 +79,31 @@ def question1(request):
     df_valid = df_arrondissement[df_arrondissement["address_zipcode"].isin(valid_zips)]
     print(df_valid.value_counts())
 
-    # creation du df pour l'affichage
-    df_show = df_valid.value_counts()
-    df_show = df_show.to_frame()
-    df_show = df_show.sort_values(by=["address_zipcode", "price_type"], ascending=True)
-    df_show = df_show.transpose()
-    df_html = df_show.to_html()
+    # creation du df free pour l'affichage
+    df_show_free = df_valid.loc[(df_valid["price_type"] == "gratuit") & (df_valid["address_zipcode"])]
+    df_show_free = df_show_free.value_counts()
+    df_show_free = df_show_free.to_frame()
+    df_show_free = df_show_free.sort_values(by=["address_zipcode", "price_type"], ascending=True)
+    # df_show_free = df_show_free.transpose()
+    df_html_free = df_show_free.to_html()
+
+    # creation du df payant pour l'affichage
+    df_show_pay = df_valid.loc[(df_valid["price_type"] == "payant") & (df_valid["address_zipcode"])]
+    df_show_pay = df_show_pay.value_counts()
+    df_show_pay = df_show_pay.to_frame()
+    df_show_pay = df_show_pay.sort_values(by=["address_zipcode", "price_type"], ascending=True)
+    # df_show_pay = df_show_pay.transpose()
+    df_html_pay = df_show_pay.to_html()
 
     # parametres du countplot
     plt.switch_backend('AGG')  # added Katsuji
-
-    mpl.rcParams['axes.labelsize'] = 20
-    mpl.rcParams['xtick.labelsize'] = 12
-    mpl.rcParams['ytick.labelsize'] = 20
-    mpl.rcParams['legend.fontsize'] = 20
+    
+    mpl.rcParams['axes.labelsize'] = 7
+    mpl.rcParams['xtick.labelsize'] = 7
+    mpl.rcParams['ytick.labelsize'] = 7
+    mpl.rcParams['legend.fontsize'] = 7
     # plt.figure(figsize=(30,30))
-    plt.figure(figsize=(10, 8))  # modified Katsuji
+    plt.figure(figsize=(6.5, 5))  # modified Katsuji
 
     # creation du countplot
     fig = sns.countplot(x="address_zipcode", hue="price_type", data=df_valid,
@@ -85,13 +111,14 @@ def question1(request):
                                "75011", "75012", "75013", "75014", "75015", "75016", "75017", "75018", "75019",
                                "75020"])
     # fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
-    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=20)
+    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=11)
     plt.xticks(rotation=45)
+
 
     countplot_file = "static/graph_images/q1_countplot.png"
     fig.get_figure().savefig(countplot_file)
 
-    return render(request, "question1.html", {"graph": countplot_file, "df_show": df_html})
+    return render(request, "question1.html", {"graph": countplot_file, "df_show": df_html_free, "df_show1": df_html_pay})
 
 
 #-------------------------------------
@@ -117,26 +144,53 @@ def question2(request):
         else:
             dict[i] = 1
 
-    df_tags = pd.DataFrame(list(dict.items()), columns=['evenement', 'occurrences'])
-    html_df_tags = df_tags.to_html()
 
-    df_filtered = df_tags[df_tags['occurrences'] > 33]
+    
+    
+    df_tags = pd.DataFrame(list(dict.items()), columns=['Évènements', 'Occurrences'])
+    
+
+    # Retirer les Evenements marqués comme "NaN"
+    # Filter NAN Data Selection column of strings by not (~) operator is used to negate the statement.
+    df_tags = df_tags[~pd.isnull(df_tags['Évènements'])]
+
+    
+    html_df_tags = df_tags.to_html()
+    # html_df_tags = df_tags.transpose().to_html()
+
+
+    df_filtered = df_tags[df_tags['Occurrences'] > 33]
+
+    # close all open figures and set the Matplotlib backend. AGG for png images
+    plt.switch_backend('AGG')
 
     # Create the pie chart
+    
     fig1, ax = plt.subplots()
+    # fig1, ax = plt.subplots(figsize = (7, 5))
 
-    ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'])
-    # ax.pie(df_filtered['occurrences'], labels=df_filtered['evenement'], autopct='%1.1f%%')
+    ax.pie(df_filtered['Occurrences'], labels=df_filtered['Évènements'], textprops={'fontsize': 10}, rotatelabels=15, startangle=90)
+    # ax.pie(df_filtered['Occurrences'], labels=df_filtered['Évènement'], autopct='%1.1f%%')
+
     # Add a title
-    ax.set_title('Pie Chart for Evenements')
+    # ax.set_title('Pie Chart for Évènements')
+    
+    
     pie_graph_file = "static/graph_images/q2_pie.png"
     plt.savefig(pie_graph_file)
     plt.close(fig1)
 
     # fig2, sns = plt.subplots()
+    
+    mpl.rcParams['axes.labelsize'] = 10
+    mpl.rcParams['xtick.labelsize'] = 8.5
+    mpl.rcParams['ytick.labelsize'] = 8.5
+    mpl.rcParams['legend.fontsize'] = 10
+    plt.figure(figsize=(6, 5)) 
 
-    sns_plot = sns.barplot(x='occurrences', y='evenement', data=df_filtered)
-    sns_plot.set_title('Barplot for Evenements')
+    sns_plot = sns.barplot(x='Occurrences', y='Évènements', data=df_filtered)
+    sns_plot.set_title('Barplot for Évènements')
+    sns_plot.set_yticklabels(sns_plot.get_yticklabels(), rotation=60)
     barplot_file = "static/graph_images/q2_barplot.png"
     sns_plot.get_figure().savefig(barplot_file)
 
@@ -317,9 +371,9 @@ def construct_graph_bar(df, condition_1, condition_lt, condition_3):
     sns.set()
 
     plt.switch_backend('AGG')
-    plt.figure(figsize=(9, 5), facecolor="w")
+    plt.figure(figsize=(6, 5), facecolor="w")
     sns.barplot(data=df_tmp, x="type", y=new_name, hue="saison", hue_order=["printemps", "ete", "automne", "hiver"])
-    title = "Nombre d'évènements par payment type"
+    title = "Nombre d'évènements par type de paiement"
     plt.title(title)
 
     plt.legend(loc='upper right')
@@ -384,19 +438,19 @@ def creation_hist_q2(df_arrondissement):
 
     plt.switch_backend('AGG')  # added Katsuji
 
-    mpl.rcParams['axes.labelsize'] = 20
-    mpl.rcParams['xtick.labelsize'] = 20
-    mpl.rcParams['ytick.labelsize'] = 20
-    mpl.rcParams['legend.fontsize'] = 20
+    mpl.rcParams['axes.labelsize'] = 10
+    mpl.rcParams['xtick.labelsize'] = 10
+    mpl.rcParams['ytick.labelsize'] = 10
+    mpl.rcParams['legend.fontsize'] = 10
     # plt.figure(figsize=(30,30))
-    plt.figure(figsize=(10, 8))  # modified Katsuji
+    plt.figure(figsize=(7, 5))  # modified Katsuji
 
     fig = sns.countplot(x="address_zipcode", hue="price_type", data=df_valid,
                         order=["75001", "75002", "75003", "75004", "75005", "75006", "75007", "75008", "75009", "75010",
                                "75011", "75012", "75013", "75014", "75015", "75016", "75017", "75018", "75019",
                                "75020"])
     # fig.set(title = " Nombre d'évènements gratuits ou payants pas arrondissement ")
-    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=20)
+    plt.title(" Nombre d'évènements gratuits ou payants par arrondissement ", fontsize=14)
 
     graph = get_graph()
     # plt.show()
@@ -408,7 +462,7 @@ def creation_hist_q2(df_arrondissement):
 #
 def construct_table_img(df):
 
-    fig, ax = plt.subplots(figsize=(8,3))
+    fig, ax = plt.subplots(figsize=(6,5))
     ax.axis('off')
     ax.axis('tight')
     ax.table(cellText=df.values,
@@ -445,3 +499,116 @@ def get_table():
     table = table.decode('utf-8')
     buffer.close()
     return table
+
+
+
+def map(request):
+
+    print("entering map()")
+    df_propre = nettoyage_df()
+
+    print(df_propre.shape)
+    show_Browser(request, df_propre)
+
+    return render(request, "map.html")
+
+def show_Browser(request, df):
+
+    print("*** entering show_Browser() ")
+
+    #arr_ = cb1.get()
+    #dft = retourve_DF_filter(gmap=True)
+
+    
+    '''
+    for index, row in dft.iterrows():
+        lat, long = row["geo_point_2d"].split(",")
+        location.append((float(long), float(lat)))
+    '''
+    
+    #print(df["lat_lon"])
+    df_loc = df["lat_lon"].str.split(",")
+
+    locations = []
+
+    for index, row in df.iterrows():
+        #print(row)
+        lat, long = row["lat_lon"].split(",")
+        locations.append((float(lat), float(long)))
+    
+    #print(locations)
+
+    xs = []
+    ys = []
+    for (x,y) in locations:
+        xs.append(x)
+        ys.append(y)
+
+    #print(f"xs = {xs}")
+    
+    d = {'lat': xs, "long": ys}
+
+    df_locatilisation = pd.DataFrame(data=d)
+
+    #print(df_locatilisation.dtypes)
+    #print(df_locatilisation.shape)
+    print("--------- df_locatilisation")
+    print(df_locatilisation)
+
+    print("--------- df")
+    df = df.reset_index()
+    print(df)
+
+    df3 = pd.concat([df, df_locatilisation], axis=1)
+    print("---------- df3")
+    print(df3)
+
+    print("+++++++++  GOOGLE MAP +++++++++++++++")
+    #gmaps.configure(api_key="AIzaSyDeRNMnZ__VnQDiATiuz4kPjF_c9r1kWe8")
+    gmaps.configure(api_key="AIzaSyAIzqnOrPwSRmgL2Elk1mBKO-P088FdNAc")
+    coordo_paris = (48.856871, 2.351298)
+    gmaps.figure()
+    gmaps.figure(center= coordo_paris, zoom_level= 12)
+
+    gmap = gmplot.GoogleMapPlotter(48.853340, 2.357791, 12)
+
+    #plot = point
+    #squat = bulle
+
+    top_attraction_lats, top_attraction_lon = zip(*locations)
+    gmap.scatter(top_attraction_lats, top_attraction_lon, 'white', size=5, marker=True)
+    gmap.heatmap(top_attraction_lats, top_attraction_lon)
+    gmap.scatter(top_attraction_lats, top_attraction_lon, 'white', marker=True)
+
+    #gmap.draw('map.html')
+    gmap.draw('templates/map.html')
+    #webbrowser.open('templates/map.html')
+    
+    
+    with open('templates/map.html', 'r') as f:
+        lines = f.readlines()
+    
+    
+    #
+    #  reference : https://github.com/somanchiu/Keyless-Google-Maps-API
+    #
+    with open('templates/map.html', 'w') as f:
+        for line in lines:
+
+            if '<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=visualization"></script>' in line:
+                f.write("{% load static %}\n")
+                #f.write('<div id="carte"><script src="https://cdn.jsdelivr.net/gh/somanchiu/Keyless-Google-Maps-API@v5.9/mapsJavaScriptAPI.js"></script>')
+                #f.write('<div id="carte"></div> <script src="{% static 'js/gm_keyless.js' %}" async defer></script>')
+                #f.write('<script src="{% static \'js/gm_keyless.js\' %}" async defer></script>')
+                f.write('<div id="carte"></div> <script src="{% static \'js/gm_keyless.js\' %}" async defer></script>')
+            else:
+                f.write(line)
+
+
+    #webbrowser.open("https://google.com")
+
+    print("+----------- end of show_Browser() ")
+
+
+
+    return
