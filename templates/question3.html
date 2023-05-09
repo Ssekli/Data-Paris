@@ -12,20 +12,17 @@
 
 
 <div class="container2">
-
     <div class="bloc_graph">
         <label class="label_graph"> Graphique :</label>
         <hr>
-        <img src="data:image/png;base64, {{graph}}" class="graph_img">
+        <img src="data:image/png;base64, {{graph}}", style="display: block; margin: auto;"><br>
     </div>
-
-
+    
     <div class="bloc_graph">
-        <label class="label_graph"> Table :</label>
+        <label class="label_graph"> Data : </label>
         <hr>
-        <img src="data:image/png;base64, {{table}}" class="graph_img">
+        <img src="data:image/png;base64, {{table}}", style="display: block; margin: auto;">
+
     </div>
-
 </div>
-
 {% endblock %}
